@@ -1,9 +1,10 @@
 import numpy as np
 
 class Layer(object):
-    def __init__(self, in_shape, out_shape, W_stddev=1.0, activation='relu'):
-        self.in_shape = input_shape
+    def __init__(self, in_shape, out_shape, W_stddev=1.0, activation='relu', step=0.01):
+        self.in_shape = in_shape
         self.out_shape = out_shape
+        self.step_size = step
         W_shape = (self.in_shape[0], self.out_shape)
         self.W = np.random.normal(size=W_shape, scale=W_stddev)
         self.b = np.zeros(self.out_shape)
@@ -13,8 +14,19 @@ class Layer(object):
         else:
             self.activation = activation
     
-    def fwd_prop(self, layer_input):
-        return self.activation(np.dot(layer_input, self.W) + self.b)
+    def fwd_prop(self, layer_in):
+        self.layer_in = layer_in
+        return self.activation(np.dot(layer_in, self.W) + self.b)
+    
+    def bwd_prop(self, layer_out):
+        grad = d_sigmoid(layer_out)
+        delta = layer_out * grad
+        self.W += np.dot(self.layer_in, delta)
+
+    @property
+    def output(self):
+        return self.activation(np.dot(self.layer_in, self.W) + self.b)
+        
 
 
 def softmax(x):
