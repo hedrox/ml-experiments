@@ -1,10 +1,9 @@
 import numpy as np
 
 class Layer(object):
-    def __init__(self, in_shape, out_shape, W_stddev=1.0, activation='relu', step=0.01):
+    def __init__(self, in_shape, out_shape, W_stddev=1.0, activation='relu'):
         self.in_shape = in_shape
         self.out_shape = out_shape
-        self.step_size = step
         W_shape = (self.in_shape[0], self.out_shape)
         self.W = np.random.normal(size=W_shape, scale=W_stddev)
         self.b = np.zeros(self.out_shape)
@@ -20,8 +19,8 @@ class Layer(object):
     
     def bwd_prop(self, layer_out):
         grad = d_sigmoid(layer_out)
-        delta = layer_out * grad
-        self.W += np.dot(self.layer_in, delta)
+        delta = -(target - layer_out) * grad * self.layer_in
+        return delta
 
     @property
     def output(self):
@@ -41,3 +40,10 @@ def d_sigmoid(x):
 
 def relu(x):
     return np.maximum(0.0,x)
+
+def MSE(target, last_layer_out):
+    return 0.5 * (target - last_layer_out)**2
+
+def total_MSE(target, last_layer_out):
+    mse = MSE(target, last_layer_out)
+    return np.sum(mse)
