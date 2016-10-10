@@ -21,6 +21,9 @@ class Layer(object):
         grad = d_sigmoid(layer_out)
         delta = -(target - layer_out) * grad * self.layer_in
         return delta
+    
+    def loss(self, y_true, y_pred):
+        pass
 
     @property
     def output(self):
