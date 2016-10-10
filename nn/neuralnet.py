@@ -5,8 +5,11 @@ class NeuralNetwork(object):
         self.layers = layers
 
     def add(self, layers):
-        self.layers += layers
-
+        if type(layers) == list:
+            self.layers.extend(layers)
+        else: 
+            self.layers.append(layers)
+        
     def predict(self, x):
         pass
 
