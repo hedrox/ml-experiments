@@ -21,9 +21,6 @@ class Layer(object):
         grad = d_sigmoid(layer_out)
         delta = -(target - layer_out) * grad * self.layer_in
         return delta
-    
-    def loss(self, y_true, y_pred):
-        pass
 
     @property
     def output(self):
@@ -43,10 +40,3 @@ def d_sigmoid(x):
 
 def relu(x):
     return np.maximum(0.0,x)
-
-def MSE(target, last_layer_out):
-    return 0.5 * (target - last_layer_out)**2
-
-def total_MSE(target, last_layer_out):
-    mse = MSE(target, last_layer_out)
-    return np.sum(mse)
