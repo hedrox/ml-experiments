@@ -11,13 +11,14 @@ class NeuralNetwork(object):
             self.layers.append(layers)
         
     def predict(self, x):
-        pass
+        input = x
+        for layer in self.layers:
+            input = layer.fwd_prop(input)
+        y_pred = input
+        return y_pred
 
     def loss(self, x, y_true):
-        input = x
-        for layers in self.layers:
-            input = layers.fwd_prop(input)
-        y_pred = input
+        y_pred = self.predict(x)
         return self.layers[-1].loss(y_true, y_pred)
 
     def save(self, file_path):
