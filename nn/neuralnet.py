@@ -9,7 +9,22 @@ class NeuralNetwork(object):
             self.layers.extend(layers)
         else: 
             self.layers.append(layers)
-        
+    
+    def fit(x, y_true, epochs=3, learning_rate=0.1, batch_size=128):
+        batches = len(x)/batch_size
+
+        for epoch in range(epochs):
+            for batch in range(batches):
+                start_batch_idx = batch * batch_size
+                end_batch_idx = start_batch_idx + batch_size
+
+                x_batch = x[start_batch_idx:end_batch_idx]
+                y_batch = y[start_batch_idx:end_batch_idx]
+
+                #forward pass
+                y_pred = self.predict(x_batch)
+
+                
     def predict(self, x):
         input = x
         for layer in self.layers:
