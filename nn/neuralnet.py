@@ -54,6 +54,9 @@ class NeuralNetwork(object):
     def cross_entropy(self, y_true, y_pred):
         return np.mean(-np.sum(y_true * np.log(y_pred)))
 
+    def binary_cross_entropy(self, y_true, y_pred):
+        return np.mean(-(y_true * np.log(y_pred) + (1-y_true) * np.log(1-y_pred)))
+
     def MSE(self, target):
         return np.mean((self.layers[-1].output - target)**2)
 
