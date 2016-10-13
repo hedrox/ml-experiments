@@ -1,4 +1,6 @@
 import numpy as np
+import h5py
+import objectives
 
 class NeuralNetwork(object):
     def __init__(self, layers):
@@ -35,30 +37,20 @@ class NeuralNetwork(object):
     def loss(self, x, y_true, loss_function):
         y_pred = self.predict(x)
         if type(loss_function) == str:
-            loss_function = getattr(self, loss_function)
+            loss_function = getattr(objectives, loss_function)
         return loss_function(y_true, y_pred)
 
     def save(self, file_path):
-        layers = [{"W": self.layers.W, "b": self.layers.b} for layer in self.layers]
-        np.save(file_path, layers)
+        for i, layer in enumerate(self.layers):
+            with h5py.File('layer_{0}.hdf5'.format(i),'w') as hfile:
+                hfile.create_dataset('W', data=layer.W)
+                hfile.create_dataset('b', data=layer.b)
 
     def restore(self, file_path):
-        layers = np.load(file_path)
-        for i in range(self.layers):
-            self.layers[i].W = layers[i]["W"]
-            self.layers[i].b = layers[i]["b"]
+        for i, layer in enumerate(self.layers):
+            with h5py.File('layer_{0}.hdf5'.format(i),'r') as hfile:
+                self.layers[i].W = hfile['W'][:]
+                self.layers[i].b = hfile['b'][:]
 
     def input_error(self, y):
         return y - self.layers[-1].output
-
-    def cross_entropy(self, y_true, y_pred):
-        return np.mean(-np.sum(y_true * np.log(y_pred)))
-
-    def binary_cross_entropy(self, y_true, y_pred):
-        return np.mean(-(y_true * np.log(y_pred) + (1-y_true) * np.log(1-y_pred)))
-
-    def MSE(self, target):
-        return np.mean((self.layers[-1].output - target)**2)
-
-    def MAE(self, target):
-        return np.mean(np.abs(self.layers[-1].output - target))
