@@ -12,19 +12,30 @@ class NeuralNetwork(object):
         else: 
             self.layers.append(layers)
     
-    def fit(x, y_true, epochs=3, learning_rate=0.1, batch_size=128):
-        batches = len(x)/batch_size
-
+    def fit(self, x, y_true, epochs=10000, learning_rate=0.1):
+        #batches = len(x)/batch_size
+        x_batch = x
+        y_batch = y_true
+        
         for epoch in range(epochs):
-            for batch in range(batches):
-                start_batch_idx = batch * batch_size
-                end_batch_idx = start_batch_idx + batch_size
-
-                x_batch = x[start_batch_idx:end_batch_idx]
-                y_batch = y[start_batch_idx:end_batch_idx]
-
+            for x_input in x_batch:
                 #forward pass
-                y_pred = self.predict(x_batch)
+                y_pred = self.predict(x_input)
+                #backward pass
+                out_error = self.output_error(y_batch, y_pred)
+                delta = out_error * self.layers[-1].d_output(y_pred)
+                for layer in enumerate(reversed(self.layers)):
+                    delta = layer.bwd_prop(delta)
+
+                #SGD
+                for layer in self.layers[1:]:
+                    layer.W += learning_rate * layer.a.dot(layer.delta)
+            # for batch in range(batches):
+            #     start_batch_idx = batch * batch_size
+            #     end_batch_idx = start_batch_idx + batch_size
+
+            #     x_batch = x[start_batch_idx:end_batch_idx]
+            #     y_batch = y[start_batch_idx:end_batch_idx]
 
                 
     def predict(self, x):
@@ -52,5 +63,5 @@ class NeuralNetwork(object):
                 self.layers[i].W = hfile['W'][:]
                 self.layers[i].b = hfile['b'][:]
 
-    def input_error(self, y):
-        return y - self.layers[-1].output
+    def output_error(self, target, output):
+        return -(target - output)

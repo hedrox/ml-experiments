@@ -1,10 +1,10 @@
 import numpy as np
 
 class Layer(object):
-    def __init__(self, in_shape, out_shape, W_stddev=1.0, activation='relu'):
+    def __init__(self, in_shape, out_shape, W_stddev=1.0, activation='sigmoid'):
         self.in_shape = in_shape
         self.out_shape = out_shape
-        W_shape = (self.in_shape[0], self.out_shape)
+        W_shape = (self.in_shape, self.out_shape)
         self.W = np.random.normal(size=W_shape, scale=W_stddev)
         self.b = np.zeros(self.out_shape)
 
@@ -15,23 +15,33 @@ class Layer(object):
     
     def fwd_prop(self, layer_in):
         self.layer_in = layer_in
-        return self.activation(np.dot(layer_in, self.W) + self.b)
+        self.a = self.activation(np.dot(layer_in, self.W) + self.b)
+        return self.a
     
-    def bwd_prop(self, layer_out):
-        grad = d_sigmoid(layer_out)
-        delta = -(target - layer_out) * grad * self.layer_in
-        return delta
+    def bwd_prop(self, delta):
+        #print "prima iter"
+        grad = d_sigmoid(self.a)
+        # print delta
+        # print self.W.T
+        print delta.dot(self.W.T)
+        self.delta = delta.dot(self.W.T) * grad
+        return self.delta
 
     @property
     def output(self):
-        return self.activation(np.dot(self.layer_in, self.W) + self.b)
+        return self.a
+
+    def d_output(self, activ):
+        return self.activation(activ, deriv=True)
         
 
 
 def softmax(x):
     return np.exp(x)/np.sum(np.exp(x), axis=0)
 
-def sigmoid(x):
+def sigmoid(x, deriv=False):
+    if deriv:
+        return d_sigmoid(x)
     return 1.0/(1.0 + np.exp(-x))
 
 def d_sigmoid(x):
