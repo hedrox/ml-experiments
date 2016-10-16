@@ -19,11 +19,8 @@ class Layer(object):
         return self.a
     
     def bwd_prop(self, delta):
-        #print "prima iter"
         grad = d_sigmoid(self.a)
-        # print delta
-        # print self.W.T
-        print delta.dot(self.W.T)
+        delta = delta.reshape(2,2)
         self.delta = delta.dot(self.W.T) * grad
         return self.delta
 

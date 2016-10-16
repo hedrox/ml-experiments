@@ -24,11 +24,13 @@ class NeuralNetwork(object):
                 #backward pass
                 out_error = self.output_error(y_batch, y_pred)
                 delta = out_error * self.layers[-1].d_output(y_pred)
-                for layer in enumerate(reversed(self.layers)):
-                    delta = layer.bwd_prop(delta)
+                self.layers[-1].delta = delta
+                for layer in range(2,len(self.layers)):
+                    delta = self.layers[-layer].bwd_prop(delta)
 
                 #SGD
                 for layer in self.layers[1:]:
+                    print layer
                     layer.W += learning_rate * layer.a.dot(layer.delta)
             # for batch in range(batches):
             #     start_batch_idx = batch * batch_size
