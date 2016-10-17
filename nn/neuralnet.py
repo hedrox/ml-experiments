@@ -12,26 +12,34 @@ class NeuralNetwork(object):
         else: 
             self.layers.append(layers)
     
-    def fit(self, x, y_true, epochs=10000, learning_rate=0.1):
+    def fit(self, x, y_true, epochs=100000, learning_rate=0.01):
         #batches = len(x)/batch_size
         x_batch = x
         y_batch = y_true
         
         for epoch in range(epochs):
-            for x_input in x_batch:
+            for x_input, y_output in zip(x_batch,y_batch):
                 #forward pass
                 y_pred = self.predict(x_input)
-                #backward pass
-                out_error = self.output_error(y_batch, y_pred)
-                delta = out_error * self.layers[-1].d_output(y_pred)
-                self.layers[-1].delta = delta
-                for layer in range(2,len(self.layers)):
-                    delta = self.layers[-layer].bwd_prop(delta)
 
+                #backward pass
+                # output layer error
+                out_error = self.output_error(y_output, y_pred)
+                delta = out_error * self.layers[-1].d_output(y_pred) * self.layers[-2].a.T
+                #delta = np.dot(delta, self.layers[-2].a.T)
+                self.layers[-1].delta = delta
+
+                # other layers error
+                for layer in range(2,len(self.layers)+1):
+                    try:
+                        last_layer_activation = self.layers[-layer-1].a
+                    except IndexError:
+                        last_layer_activation = self.layers[-layer].a
+                    delta = self.layers[-layer].bwd_prop(delta, last_layer_activation, self.layers[-layer+1].W)
+                
                 #SGD
-                for layer in self.layers[1:]:
-                    print layer
-                    layer.W += learning_rate * layer.a.dot(layer.delta)
+                for layer in self.layers:
+                    layer.W -= learning_rate * layer.delta
             # for batch in range(batches):
             #     start_batch_idx = batch * batch_size
             #     end_batch_idx = start_batch_idx + batch_size
@@ -65,5 +73,6 @@ class NeuralNetwork(object):
                 self.layers[i].W = hfile['W'][:]
                 self.layers[i].b = hfile['b'][:]
 
+    # quadratic cost function
     def output_error(self, target, output):
         return -(target - output)

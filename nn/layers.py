@@ -18,10 +18,10 @@ class Layer(object):
         self.a = self.activation(np.dot(layer_in, self.W) + self.b)
         return self.a
     
-    def bwd_prop(self, delta):
+    def bwd_prop(self, delta, last_layer_activation, previous_layer_w):
         grad = d_sigmoid(self.a)
-        delta = delta.reshape(2,2)
-        self.delta = delta.dot(self.W.T) * grad
+        delta = np.dot(previous_layer_w.T, delta) * grad
+        self.delta = np.dot(delta, last_layer_activation.T)
         return self.delta
 
     @property
@@ -42,8 +42,7 @@ def sigmoid(x, deriv=False):
     return 1.0/(1.0 + np.exp(-x))
 
 def d_sigmoid(x):
-    sig = sigmoid(x)
-    return sig*(1.0-sig)
+    return x*(1.0-x)
 
 def relu(x):
     return np.maximum(0.0,x)
