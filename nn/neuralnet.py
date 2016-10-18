@@ -25,21 +25,18 @@ class NeuralNetwork(object):
                 #backward pass
                 # output layer error
                 out_error = self.output_error(y_output, y_pred)
-                delta = out_error * self.layers[-1].d_output(y_pred) * self.layers[-2].a.T
-                #delta = np.dot(delta, self.layers[-2].a.T)
+                delta = out_error * self.layers[-1].d_output(y_pred)
+                delta = np.dot(delta, self.layers[-1].a.T)
                 self.layers[-1].delta = delta
 
                 # other layers error
-                for layer in range(2,len(self.layers)+1):
-                    try:
-                        last_layer_activation = self.layers[-layer-1].a
-                    except IndexError:
-                        last_layer_activation = self.layers[-layer].a
+                for layer in range(2,len(self.layers)):
+                    last_layer_activation = self.layers[-layer-1].a
                     delta = self.layers[-layer].bwd_prop(delta, last_layer_activation, self.layers[-layer+1].W)
                 
                 #SGD
-                for layer in self.layers:
-                    layer.W -= learning_rate * layer.delta
+                for layer in self.layers[1:]:
+                    layer.W += -learning_rate * layer.delta
             # for batch in range(batches):
             #     start_batch_idx = batch * batch_size
             #     end_batch_idx = start_batch_idx + batch_size
