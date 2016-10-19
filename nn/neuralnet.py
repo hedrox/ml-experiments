@@ -47,7 +47,8 @@ class NeuralNetwork(object):
                 
     def predict(self, x):
         input = x
-        for layer in self.layers:
+        # ignore the input layer
+        for layer in self.layers[1:]:
             input = layer.fwd_prop(input)
         y_pred = input
         return y_pred

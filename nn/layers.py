@@ -1,12 +1,13 @@
 import numpy as np
 
 class Layer(object):
-    def __init__(self, in_shape, out_shape, W_stddev=1.0, activation='sigmoid'):
+    def __init__(self, in_shape, out_shape, input_layer=False, W_stddev=1.0, activation='sigmoid', params={}):
         self.in_shape = in_shape
         self.out_shape = out_shape
         W_shape = (self.in_shape, self.out_shape)
-        self.W = np.random.normal(size=W_shape, scale=W_stddev)
-        self.b = np.zeros(self.out_shape)
+        if not input_layer:
+            self.W = np.random.normal(size=W_shape, scale=W_stddev) if not params else params['W']
+            self.b = np.zeros(self.out_shape) if not params else params['b']
 
         if type(activation) == str:
             self.activation = globals().copy().get(activation)
@@ -15,7 +16,7 @@ class Layer(object):
     
     def fwd_prop(self, layer_in):
         self.layer_in = layer_in
-        self.a = self.activation(np.dot(layer_in, self.W) + self.b)
+        self.a = self.activation(np.dot(layer_in, self.W.T) + self.b)
         return self.a
     
     def bwd_prop(self, delta, last_layer_activation, previous_layer_w):
