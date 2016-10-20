@@ -26,17 +26,24 @@ class NeuralNetwork(object):
                 # output layer error
                 out_error = self.output_error(y_output, y_pred)
                 delta = out_error * self.layers[-1].d_output(y_pred)
-                delta = np.dot(delta, self.layers[-1].a.T)
-                self.layers[-1].delta = delta
+                dw = []
+                for delt in delta:
+                    for activ in self.layers[-2].a:
+                        dw.append(delt*activ)
+                dW = np.array(dw).reshape(self.layers[-1].W.shape)
+                self.layers[-1].dW = dW
 
-                # other layers error
-                for layer in range(2,len(self.layers)):
-                    last_layer_activation = self.layers[-layer-1].a
-                    delta = self.layers[-layer].bwd_prop(delta, last_layer_activation, self.layers[-layer+1].W)
-                
+                # hidden layers error
+                for layer in reversed(range(1,len(self.layers)-1)):
+                    try:
+                        layer_activation = self.layers[layer-1].a
+                    except AttributeError:
+                        layer_activation = x_input
+                    delta = self.layers[layer].bwd_prop(delta, layer_activation, self.layers[layer+1].W)
+      
                 #SGD
                 for layer in self.layers[1:]:
-                    layer.W += -learning_rate * layer.delta
+                    layer.W -= learning_rate * layer.dW
             # for batch in range(batches):
             #     start_batch_idx = batch * batch_size
             #     end_batch_idx = start_batch_idx + batch_size
