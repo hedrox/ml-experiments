@@ -11,3 +11,6 @@ def MSE(target, output):
 
 def MAE(target, output):
     return np.mean(np.abs(output - target))
+
+def KL_divergence(target, output):
+    return np.sum(target * np.log(target / output), axis=-1)

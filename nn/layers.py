@@ -38,6 +38,12 @@ class Layer(object):
         return self.activation(activ, deriv=True)
         
 
+class ConvLayer(Layer):
+    def __init__(self, in_shape, out_shape, filter_number, filter_length, activation='sigmoid'):
+        self.filter_number = filter_number
+        self.filter_length = filter_length
+        super(ConvLayer, self).__init__(in_shape, out_shape, activation=activation)
+
 
 def softmax(x):
     return np.exp(x)/np.sum(np.exp(x), axis=0)
