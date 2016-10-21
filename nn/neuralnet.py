@@ -13,44 +13,26 @@ class NeuralNetwork(object):
             self.layers.append(layers)
     
     def fit(self, x, y_true, epochs=100000, learning_rate=0.01):
-        #batches = len(x)/batch_size
         x_batch = x
         y_batch = y_true
         
         for epoch in range(epochs):
             for x_input, y_output in zip(x_batch,y_batch):
-                #forward pass
+                # forward pass
                 y_pred = self.predict(x_input)
 
-                #backward pass
+                # backward pass
                 # output layer error
                 out_error = self.output_error(y_output, y_pred)
                 delta = out_error * self.layers[-1].d_output(y_pred)
-                dw = []
-                for delt in delta:
-                    for activ in self.layers[-2].a:
-                        dw.append(delt*activ)
-                dW = np.array(dw).reshape(self.layers[-1].W.shape)
-                self.layers[-1].dW = dW
-
+                self.output_bwd_prop(delta)
+                
                 # hidden layers error
                 for layer in reversed(range(1,len(self.layers)-1)):
-                    try:
-                        layer_activation = self.layers[layer-1].a
-                    except AttributeError:
-                        layer_activation = x_input
+                    layer_activation = x_input if layer == 1 else self.layers[layer-1].a
                     delta = self.layers[layer].bwd_prop(delta, layer_activation, self.layers[layer+1].W)
-      
-                #SGD
-                for layer in self.layers[1:]:
-                    layer.W -= learning_rate * layer.dW
-            # for batch in range(batches):
-            #     start_batch_idx = batch * batch_size
-            #     end_batch_idx = start_batch_idx + batch_size
 
-            #     x_batch = x[start_batch_idx:end_batch_idx]
-            #     y_batch = y[start_batch_idx:end_batch_idx]
-
+                self.SGD(learning_rate)
                 
     def predict(self, x):
         input = x
@@ -65,6 +47,20 @@ class NeuralNetwork(object):
         if type(loss_function) == str:
             loss_function = getattr(objectives, loss_function)
         return loss_function(y_true, y_pred)
+
+    def SGD(self, learning_rate):
+        # ignore the input layer
+        for layer in self.layers[1:]:
+            layer.W -= learning_rate * layer.dW
+
+    def output_bwd_prop(self, delta):
+        dw = []
+        for d in delta:
+            for a in self.layers[-2].a:
+                dw.append(d*a)
+        dW = np.array(dw).reshape(self.layers[-1].W.shape)
+        self.layers[-1].dW = dW
+        return dW
 
     def save(self, file_path):
         for i, layer in enumerate(self.layers):

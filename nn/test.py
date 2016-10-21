@@ -29,12 +29,7 @@ class Network(unittest.TestCase):
         self.assertEqual('{0:.3f}'.format(delta[0]), '-0.027')
         self.assertEqual('{0:.3f}'.format(delta[1]), '0.141')
 
-        dw = []
-        for delt in delta:
-            for activ in self.nn.layers[-2].a:
-                dw.append(delt*activ)
-        
-        output_dW = np.array(dw).reshape(self.nn.layers[-1].W.shape)
+        output_dW = self.nn.output_bwd_prop(delta)
         self.assertEqual('{0:.3f}'.format(output_dW[0][0]), '-0.021')
         self.assertEqual('{0:.3f}'.format(output_dW[0][1]), '-0.011')
         self.assertEqual('{0:.3f}'.format(output_dW[1][0]), '0.109')
@@ -43,10 +38,7 @@ class Network(unittest.TestCase):
 
         # hidden layers error
         for layer in reversed(range(1,len(self.nn.layers)-1)):
-            try:
-                layer_activation = self.nn.layers[layer-1].a
-            except AttributeError:
-                layer_activation = X
+            layer_activation = X if layer == 1 else self.nn.layers[layer-1].a
             delta = self.nn.layers[layer].bwd_prop(delta, layer_activation, self.nn.layers[layer+1].W)
         
         hidden_dW = self.nn.layers[-2].dW
@@ -65,8 +57,8 @@ class Network(unittest.TestCase):
 
 # Y = np.array([0,1,1,0])
 
-# X = np.array([[0,1],[1,0]])
-# Y = np.array([[1,0],[1,1]])
+# X = np.array([[0,1], [1,0]])
+# Y = np.array([[1,0], [0,1]])
 
 # nn = neuralnet.NeuralNetwork(layers)
 # nn.fit(X, Y)

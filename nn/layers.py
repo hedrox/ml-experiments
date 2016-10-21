@@ -15,18 +15,17 @@ class Layer(object):
             self.activation = activation
     
     def fwd_prop(self, layer_in):
-        self.layer_in = layer_in
         self.a = self.activation(np.dot(layer_in, self.W.T) + self.b)
         return self.a
     
     def bwd_prop(self, delta, layer_activation, layer_w):
         out_delta = np.dot(delta, layer_w)
-        grad = d_sigmoid(self.a)
+        grad = self.activation(self.a, deriv=True)
         delta = out_delta * grad
         dw = []
-        for delt in delta:
-            for activ in layer_activation:
-                dw.append(delt*activ)
+        for d in delta:
+            for a in layer_activation:
+                dw.append(d*a)
         dW = np.array(dw).reshape(layer_w.shape)
         self.dW = dW
         return delta
@@ -48,8 +47,8 @@ def sigmoid(x, deriv=False):
         return d_sigmoid(x)
     return 1.0/(1.0 + np.exp(-x))
 
-def d_sigmoid(x):
-    return x*(1.0-x)
+def d_sigmoid(a):
+    return a*(1.0-a)
 
 def relu(x):
     return np.maximum(0.0,x)
