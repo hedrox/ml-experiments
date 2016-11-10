@@ -39,10 +39,16 @@ class Layer(object):
         
 
 class ConvLayer(Layer):
-    def __init__(self, in_shape, out_shape, filter_number, filter_length, activation='sigmoid'):
-        self.filter_number = filter_number
-        self.filter_length = filter_length
-        super(ConvLayer, self).__init__(in_shape, out_shape, activation=activation)
+    def __init__(self, n_filter, filter_shape, strides, W_stddev=1.0, padding_model='same', activation='linear'):
+        self.in_shape = in_shape
+        self.n_filter = n_filter
+        self.filter_shape = filter_shape
+        self.strides = strides
+        self.padding_mode = padding_mode
+        self.activation = activation
+        W_shape = (self.in_shape, self.n_filter) + self.filter_shape
+        self.W = rng.normal(size=W_shape, scale=W_stddev)
+        self.b = np.zeros(self.n_filter)
 
 
 def softmax(x):
