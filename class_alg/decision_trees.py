@@ -1,4 +1,5 @@
 from collections import Counter
+
 # sex, age, survived
 data = [['male', 20, False], 
         ['female', 20, True],
@@ -23,20 +24,14 @@ def divide_set(rows, column, value):
             set2.append(row)
     return (set1, set2)
 
-# print(divide_set(data, 1, 15))
-
 def get_count(data):
     resulting_data = []
     counter = [Counter() for _ in range(len(data))]
     for elem, counter in zip(data,counter):
         counter.update(elem[2])
-        resulting_data.append((elem,counter))
+        resulting_data.append((elem, counter))
     return resulting_data
 
-resulting_data = get_count(divide_set(data,1,15))
+resulting_data = get_count(divide_set(data, 1, 15))
 print(resulting_data)
 
-# for elem in divide_set(data, 1, 15):
-#     for el in elem:
-#         counter.update([el[2]])
-# print(counter)

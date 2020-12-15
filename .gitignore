@@ -2,3 +2,4 @@
 *.pyc
 *.pickle
 *venv/
+*__pycache__/

@@ -3,11 +3,14 @@ import numpy as np
 import neuralnet
 import layers
 
+
 class Network(unittest.TestCase):
     def setUp(self):
         params_layer2 = {'W': np.array([[-0.5, 0.7],[1.3, -1]]), 'b': np.array([0.5, 0.7])}
         params_layer3 = {'W': np.array([[0.5, 0.3],[0.2, 1]]), 'b': np.array([1, 0.5])}
-        nn_layers = [layers.Layer(2, 2, input_layer=True), layers.Layer(2,2,params=params_layer2), layers.Layer(2,2, params=params_layer3)]
+        nn_layers = [layers.Layer(2, 2, input_layer=True),
+                     layers.Layer(2, 2, params=params_layer2),
+                     layers.Layer(2, 2, params=params_layer3)]
         self.nn = neuralnet.NeuralNetwork(nn_layers)
 
     def test_feedforward(self):
@@ -17,8 +20,8 @@ class Network(unittest.TestCase):
         self.assertEqual('{0:.3f}'.format(y_pred[1]), '0.746')
 
     def test_backpropagation(self):
-        X = np.array([0,1])
-        y_output = np.array([1,0])
+        X = np.array([0, 1])
+        y_output = np.array([1, 0])
         y_pred = self.nn.predict(X)
 
         out_error = self.nn.output_error(y_output, y_pred)
@@ -39,14 +42,14 @@ class Network(unittest.TestCase):
         # hidden layers error
         for layer in reversed(range(1,len(self.nn.layers)-1)):
             layer_activation = X if layer == 1 else self.nn.layers[layer-1].a
-            delta = self.nn.layers[layer].bwd_prop(delta, layer_activation, self.nn.layers[layer+1].W)
-        
+            delta = self.nn.layers[layer].bwd_prop(delta, layer_activation,
+                                                   self.nn.layers[layer+1].W)
+
         hidden_dW = self.nn.layers[-2].dW
         self.assertEqual('{0:.3f}'.format(hidden_dW[0][0]), '0.000')
         self.assertEqual('{0:.3f}'.format(hidden_dW[0][1]), '0.003')
         self.assertEqual('{0:.3f}'.format(hidden_dW[1][0]), '0.000')
         self.assertEqual('{0:.3f}'.format(hidden_dW[1][1]), '0.033')
-    
 
 # layers = [layers.Layer(2,2,input_layer=True), layers.Layer(2,2), layers.Layer(2,2)]
 
@@ -64,3 +67,6 @@ class Network(unittest.TestCase):
 # nn.fit(X, Y)
 # for e in X:
 #     print e, nn.predict(e)
+
+if __name__ == '__main__':
+    unittest.main()

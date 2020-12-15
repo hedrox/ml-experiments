@@ -1,4 +1,5 @@
-import gym, sys, random
+import random
+import gym
 import numpy as np
 
 hyperparams = {'lr': 0.8,
@@ -14,7 +15,7 @@ def explore(eps):
     return random.uniform(0,1) < eps
 
 verbose = False
-env = gym.make('Taxi-v2').env
+env = gym.make('Taxi-v3').env
 if verbose:
     env.render()
 
@@ -37,18 +38,18 @@ for epoch in range(1, hyperparams['epochs']+1):
             action = np.argmax(q_table[obs])
 
         # make the step on the selected action
-        next_obs, reward, done, info = env.step(action)
+        next_obs, reward, done, _ = env.step(action)
 
         # return the maximum value from the next observation
         next_max_obs = np.max(q_table[next_obs])
 
         # bellman equation
-        q_table[obs,action] = (q_table[obs,action] + hyperparams['lr'] * 
-                              (reward + hyperparams['discount'] * next_max_obs - q_table[obs,action]))
+        q_table[obs,action] = (q_table[obs,action] + hyperparams['lr'] *
+                            (reward + hyperparams['discount'] * next_max_obs - q_table[obs,action]))
 
         obs = next_obs
         total_rewards += reward
-    
+
     # reduce the exploration rate by the decay factor with every epoch
     epsilon = max(hyperparams['eps']['min'], epsilon * hyperparams['eps']['decay'])
     rewards.append(total_rewards)
@@ -67,7 +68,7 @@ def run(episodes):
         while not done:
             action = np.argmax(q_table[obs,:])
 
-            next_obs, reward, done, info = env.step(action)
+            next_obs, _, done, _ = env.step(action)
             env.render()
 
             obs = next_obs
