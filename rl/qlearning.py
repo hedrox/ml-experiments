@@ -11,7 +11,7 @@ hyperparams = {'lr': 0.8,
                       }
                }
 
-def explore(eps):
+def explore(eps: float) -> float:
     return random.uniform(0,1) < eps
 
 verbose = False
@@ -57,7 +57,7 @@ for epoch in range(1, hyperparams['epochs']+1):
 if verbose:
     print("Q table: {}".format(q_table))
 
-def run(episodes):
+def run(episodes: int) -> None:
     for episode in range(1, episodes+1):
         obs = env.reset()
         done = False

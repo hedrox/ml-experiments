@@ -1,9 +1,11 @@
+from typing import Dict, Tuple
 import numpy as np
 
 
 class Layer:
-    def __init__(self, in_shape, out_shape, input_layer=False,
-                 W_stddev=1.0, activation='sigmoid', params=None):
+    def __init__(self, in_shape: int, out_shape: int, input_layer: bool = False,
+                 W_stddev: float = 1.0, activation: str = 'sigmoid',
+                 params: Dict[str, np.ndarray] = None):
         self.in_shape = in_shape
         self.out_shape = out_shape
         W_shape = (self.in_shape, self.out_shape)
@@ -16,11 +18,12 @@ class Layer:
         else:
             self.activation = activation
 
-    def fwd_prop(self, layer_in):
+    def fwd_prop(self, layer_in: np.ndarray) -> np.ndarray:
         self.activ = self.activation(np.dot(layer_in, self.W.T) + self.b)
         return self.activ
 
-    def bwd_prop(self, delta, layer_activation, layer_w):
+    def bwd_prop(self, delta: np.ndarray, layer_activation: np.ndarray,
+                 layer_w: np.ndarray) -> np.ndarray:
         out_delta = np.dot(delta, layer_w)
         grad = self.activation(self.activ, deriv=True)
         delta = out_delta * grad
@@ -33,16 +36,16 @@ class Layer:
         return delta
 
     @property
-    def output(self):
+    def output(self) -> np.ndarray:
         return self.activ
 
-    def d_output(self, activ):
+    def d_output(self, activ) -> np.ndarray:
         return self.activation(activ, deriv=True)
 
 
 class ConvLayer(Layer):
-    def __init__(self, in_shape, n_filter, filter_shape, strides,
-                 W_stddev=1.0, padding_mode='same', activation='linear'):
+    def __init__(self, in_shape: int, n_filter: int, filter_shape: Tuple, strides: int,
+                 W_stddev: float = 1.0, padding_mode:str = 'same', activation: str = 'linear'):
         self.in_shape = in_shape
         self.n_filter = n_filter
         self.filter_shape = filter_shape
@@ -54,16 +57,16 @@ class ConvLayer(Layer):
         self.b = np.zeros(self.n_filter)
 
 
-def softmax(x):
+def softmax(x: np.ndarray) -> np.ndarray:
     return np.exp(x)/np.sum(np.exp(x), axis=0)
 
-def sigmoid(x, deriv=False):
+def sigmoid(x: np.ndarray, deriv: bool = False) -> np.ndarray:
     if deriv:
         return d_sigmoid(x)
     return 1.0/(1.0 + np.exp(-x))
 
-def d_sigmoid(a):
+def d_sigmoid(a: np.ndarray) -> np.ndarray:
     return a*(1.0-a)
 
-def relu(x):
+def relu(x: float) -> float:
     return np.maximum(0.0,x)

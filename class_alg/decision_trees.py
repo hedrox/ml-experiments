@@ -1,19 +1,22 @@
+import pprint
 from collections import Counter
+from typing import List, Tuple
+
 
 # sex, age, survived
-data = [['male', 20, False], 
+data = [['male', 20, False],
         ['female', 20, True],
-        ['male', 8, True], 
+        ['male', 8, True],
         ['female', 30, True],
-        ['male', 16, False], 
+        ['male', 16, False],
         ['female', 50, False],
-        ['male', 8, True], 
+        ['male', 8, True],
         ['female', 18, True],
-        ['male', 10, True], 
+        ['male', 10, True],
         ['female', 50, False],
         ]
 
-def divide_set(rows, column, value):
+def divide_set(rows: List, column: int, value: float) -> Tuple:
     split_function = lambda row:row[column] >= value
     set1 = []
     set2 = []
@@ -24,14 +27,14 @@ def divide_set(rows, column, value):
             set2.append(row)
     return (set1, set2)
 
-def get_count(data):
+def get_count(data: tuple) -> List:
     resulting_data = []
     counter = [Counter() for _ in range(len(data))]
-    for elem, counter in zip(data,counter):
-        counter.update(elem[2])
-        resulting_data.append((elem, counter))
+    for elem, ct in zip(data, counter):
+        ct.update(elem[2])
+        resulting_data.append((elem, ct))
     return resulting_data
 
 resulting_data = get_count(divide_set(data, 1, 15))
-print(resulting_data)
-
+pp = pprint.PrettyPrinter()
+pp.pprint(resulting_data)
